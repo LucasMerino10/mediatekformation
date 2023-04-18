@@ -26,11 +26,21 @@ class PlaylistRepository extends ServiceEntityRepository
     private const P_ID = "p.id";
     private const P_NAME = "p.name";
                 
+    /**
+     * Constructeur de la classe
+     * @param ManagerRegistry $registry
+     */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Playlist::class);
     }
 
+    /**
+     * Permet l'ajout d'une playlist
+     * @param Playlist $entity
+     * @param bool $flush
+     * @return void
+     */
     public function add(Playlist $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
@@ -40,6 +50,12 @@ class PlaylistRepository extends ServiceEntityRepository
         }
     }
 
+    /**
+     * Permet la suppression d'une playlist
+     * @param Playlist $entity
+     * @param bool $flush
+     * @return void
+     */
     public function remove(Playlist $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
@@ -71,18 +87,17 @@ class PlaylistRepository extends ServiceEntityRepository
     }
 
     /**
-     * Enregistrements dont un champ contient une valeur
-     * ou tous les enregistrements si la valeur est vide
+     * Retourne les playlist dont le nom contient la valeur du champ renseigné
+     * ou retourne tous les enregistrements si la valeur est vide
      * @param type $champ
      * @param type $valeur
-     * @param type $table si $champ dans une autre table
      * @return Playlist[]
      */
-    public function findByContainValue($champ, $valeur, $table=""): array{
+    public function findByContainValue($champ, $valeur): array{
         if($valeur==""){
             return $this->findAllOrderBy('name', 'ASC');
         }    
-        if($table==""){      
+        else{    
             return $this->createQueryBuilder('p')
                     ->select(self::P_ID_ID)
                     ->addSelect(self::P_NAME_NAME)
@@ -96,8 +111,23 @@ class PlaylistRepository extends ServiceEntityRepository
                     ->orderBy(self::P_NAME, 'ASC')
                     ->addOrderBy(self::C_NAME)
                     ->getQuery()
-                    ->getResult();              
-        }else{   
+                    ->getResult();                                   
+        }           
+    }   
+    
+    /**
+     * Retourne les playlist dont la catégorie correspond avec la valeur du 
+     * champ ou retourne tous les enregistrements si la valeur est vide
+     * @param type $champ
+     * @param type $valeur
+     * @param type $table si $champ dans une autre table
+     * @return Playlist[]
+     */
+    public function findByContainValueTable($champ, $valeur, $table): array{
+        if($valeur==""){
+           return $this->findAllOrderBy('name', 'ASC');
+        }  
+        else{
             return $this->createQueryBuilder('p')
                     ->select(self::P_ID_ID)
                     ->addSelect(self::P_NAME_NAME)
@@ -111,10 +141,9 @@ class PlaylistRepository extends ServiceEntityRepository
                     ->orderBy(self::P_NAME, 'ASC')
                     ->addOrderBy(self::C_NAME)
                     ->getQuery()
-                    ->getResult();              
-            
-        }           
-    }    
+                    ->getResult(); 
+        }
+    }
 
 
     
